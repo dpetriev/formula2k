@@ -1,0 +1,844 @@
+﻿
+***********************************************************
+MIT Licence
+
+*************************************************************
+ // Cекции описания типов, переменных и констант:
+ Type
+   TNamePin       = Array[1..12]of string;
+   TNameOUTPin    = Array[1..4]of string;
+   TNumberPin     = array[1..12] of Integer;
+   TNumberINPin   = array[1..4] of Integer;
+   TNumberOUTPin  = array[1..4] of Integer;
+   TSendPat       = array[1..4] of Integer;
+ Const
+   PIN_BOARD_CNT  = 1;//Номер задействованной платы PIN2К
+   PIN_BOARD_IN_LOAD = 2;//Номер платы PIN для задания нагрузки и вторых уровней
+
+   //Номера задействованных каналов платы PIN:
+   Pin01_Res1  = ((PIN_BOARD_CNT - 1)*16) + 01;   //вход сброса 1 тригера
+   Pin02_D1    = ((PIN_BOARD_CNT - 1)*16) + 02;   //вход данных 1 тригера
+   Pin03_C1    = ((PIN_BOARD_CNT - 1)*16) + 03;   //вход тактирования 1 тригера
+   Pin04_Set1  = ((PIN_BOARD_CNT - 1)*16) + 04;   //вход установки 1 тригера
+   Pin05_Q1    = ((PIN_BOARD_CNT - 1)*16) + 05;   //прямой выход 1 тригера
+   Pin06_NQ1   = ((PIN_BOARD_CNT - 1)*16) + 06;   //инверсный выход 1 тригера
+   Pin07       = ((PIN_BOARD_CNT - 1)*16) + 16;   //не используется
+   Pin08_NQ2   = ((PIN_BOARD_CNT - 1)*16) + 08;   //инверсный выход 2 тригера
+   Pin09_Q2    = ((PIN_BOARD_CNT - 1)*16) + 09;   //прямой выход 2 тригера
+   Pin10_Set2  = ((PIN_BOARD_CNT - 1)*16) + 10;   //вход установки 2 тригера
+   Pin11_C2    = ((PIN_BOARD_CNT - 1)*16) + 11;   //вход тактирования 2 тригера
+   Pin12_D2    = ((PIN_BOARD_CNT - 1)*16) + 12;   //вход данных 2 тригера
+   Pin13_Res2  = ((PIN_BOARD_CNT - 1)*16) + 13;   //вход сброса 2 тригера
+   Pin14       = ((PIN_BOARD_CNT - 1)*16) + 14;   //не используется
+   Pin15       = ((PIN_BOARD_CNT - 1)*16) + 15;   //не используется
+   Pin16       = ((PIN_BOARD_CNT - 1)*16) + 16;   //не используется
+
+   Pin17_Res1 = ((PIN_BOARD_IN_LOAD - 1)*16) + 01; //вход сброса 1 тригера
+   Pin20_Set1 = ((PIN_BOARD_IN_LOAD - 1)*16) + 04; //вход установки 1 тригера
+   
+   Pin21_R1 = ((PIN_BOARD_IN_LOAD - 1)*16) + 05;//резистор на пр.выход 1 тригера
+   Pin22_R2 = ((PIN_BOARD_IN_LOAD - 1)*16) + 06;//резистор на инв.выход 1 тригера
+   Pin24_R3 = ((PIN_BOARD_IN_LOAD - 1)*16) + 08;//резистор на инв.выход 2 тригера
+   Pin25_R4 = ((PIN_BOARD_IN_LOAD - 1)*16) + 09;//резистор на пр.выход 2 тригера
+   
+   Pin26_Set2 = ((PIN_BOARD_IN_LOAD - 1)*16) + 10; //вход установки 2 тригера
+   Pin29_Res1 = ((PIN_BOARD_IN_LOAD - 1)*16) + 13; //вход сброса 2 тригера
+
+ //Количество информационных выводов мимкросхемы
+   NumOfPin = 12;
+
+ //Массив выводов объекта контроля в порядке от 1-го до 12-го
+   ALL_PINS : TNumberPin = (Pin01_Res1,  Pin02_D1,   Pin03_C1,  Pin04_Set1,
+                            Pin05_Q1,    Pin06_NQ1,             Pin08_NQ2,
+                            Pin09_Q2,    Pin10_Set2, Pin11_C2,  Pin12_D2,
+                            Pin13_Res2);
+  //Массивы вх.выводов объекта контроля подключаемых с платы 1 и платы 2
+   IN_PINS_B1 : TNumberINPin = (Pin02_D1, Pin03_C1, Pin11_C2, Pin12_D2);
+   IN_PINS_B2 : TNumberINPin = (Pin17_Res1, Pin20_Set1, Pin26_Set2, Pin29_Res1);
+   OUT_PINS   : TNumberOUTPin = (Pin05_Q1, Pin06_NQ1, Pin08_NQ2, Pin09_Q2);
+   
+//Массив имен выводов объекта контроля: Наименование/номер вывода
+   PIN_NAMES : TNamePin = ( 'R1/01', 'D1/02', 'C1/03', 'S1/04', 'Q1/05', 'NQ1/06',
+                            'NQ2/08', 'Q2/09','S2/10', 'C2/11', 'D2/12',
+                            'R2/13');
+   PIN_NAMES_OUT  : TNameOUTPin = ( 'Q1/05', 'NQ1/06', 'NQ2/08','Q2/09');
+
+//массивы уставок входных сигналов при измерении входных токов
+//входные сигналы для измерения токов высокого, пробивного уровня
+//                                                для C, D PIN(2,3,11,12)
+  SetHL1  :  TSendPat = ( !0000000000000000,
+                          !0000000000000000,
+                          !0000000000000000,
+                          !0000000000000000);
+
+  SetBLK1 : TSendPat =  ( !1111111111111110,
+                          !1111111111111010,
+                          !1110101111111111,
+                          !1110011111111111);
+
+//входные сигналы для измерения токов высокого. пробивного
+//                                              уровня для R, S PIN(1,4,10,13)
+  SetHL2  : TSendPat =  ( !0000000000000000,
+                          !0000000000000011,
+                          !0001100000000000,
+                          !0000000000000000);
+  SetBLK2 : TSendPat  = ( !1111111111111000,
+                          !1111111111110000,
+                          !1110000111111111,
+                          !1110001111111111);
+
+//входные сигналы для измерения токов низкого уровня для C, D PIN(2,3,11,12)
+  SetHL3  :  TSendPat = ( !0000000000000001,
+                          !0000000000000001,
+                          !0001000000000000,
+                          !0001000000000000);
+  SetBLK3 : TSendPat =  ( !1111111111111000,
+                          !1111111111110000,
+                          !1110000111111111,
+                          !1111000111111111);
+
+//входные сигналы для измерения токов низкого уровня для R, S PIN(1,4,10,13)
+  SetHL4  : TSendPat =  ( !0000000000000110,
+                          !0000000000000000,
+                          !0000000000000000,
+                          !0000110000000000);
+  SetBLK4 : TSendPat  = ( !1111111111110000,
+                          !1111111111110001,
+                          !1111000111111111,
+                          !1110000111111111);
+//входные сигналы для измерения выходных токов короткого замыкания
+//                                                  для Q, NQ PIN(5,6,8,9)
+  SetHL5  : TSendPat =  ( !0000000000000001,
+                          !0000000000001000,
+                          !0000001000000000,
+                          !0001000000000000);
+  SetBLK5 : TSendPat  = ( !1111111111110110,
+                          !1111111111110110,
+                          !1110110111111111,
+                          !1110110111111111);
+                          
+//Набор всех выводов объекта контроля, кроме питания и земли
+   ALL_PINS_GROUP : TLargeSet = [Pin01_Res1,  Pin02_D1,   Pin03_C1,  Pin04_Set1,
+                                 Pin05_Q1,    Pin06_NQ1,              Pin08_NQ2,
+                                 Pin09_Q2,    Pin10_Set2, Pin11_C2,  Pin12_D2,
+                                 Pin13_Res2];
+
+//Набор входов объекта контроля
+   IN_PINS_GROUP : TLargeSet = [Pin01_Res1,  Pin02_D1, Pin03_C1, Pin04_Set1,
+                                Pin10_Set2,  Pin11_C2, Pin12_D2, Pin13_Res2];
+//Набор входов объекта контроля C, D по первой плате PIN
+   IN_PINS_GROUP_B1 : TLargeSet = [ Pin02_D1, Pin03_C1,
+                                    Pin11_C2, Pin12_D2];
+//Набор входов объекта контроля R, S по первой плате PIN
+   IN_PINS_RS_GROUP_B1 : TLargeSet = [Pin01_Res1, Pin04_Set1,
+                                      Pin10_Set2, Pin13_Res2];
+//Набор входов объекта контроля R, S по второй плате PIN
+   IN_PINS_GROUP_B2 : TLargeSet = [Pin17_Res1,  Pin20_Set1,
+                                   Pin26_Set2,  Pin29_Res1];
+                               
+//Набор выходов объекта контроля
+  OUT_PINS_GROUP   :TLargeSet  = [Pin05_Q1, Pin06_NQ1, Pin08_NQ2, Pin09_Q2];
+  OUT_PINS_GROUP_Q :TLargeSet  = [Pin05_Q1, Pin09_Q2];
+  OUT_PINS_GROUP_NQ:TLargeSet  = [Pin06_NQ1, Pin08_NQ2];
+
+//Массив каналов для задания нагрузки при ФК
+  LOAD_PINS : TLargeSet = [Pin21_R1, Pin22_R2, Pin24_R3, Pin25_R4];
+  
+
+//*********************секция процедур******************************************
+//------------------------------------------------------------------------------
+//Процедура выполняющая предустановочный ФК, по окончанию все каналы остаются
+//              в состоянии последнего вектора
+//------------------------------------------------------------------------------
+procedure Run_FC_ST_Wait(StartVector, StopVector: Integer);
+//StartVector - номер начального вектора
+//StopVector  - номер вектора останова ФК
+  var
+    Vector,          //Номер вектора на котором остановлен ФК
+    Stop: Integer;   //Текущее состояние ФК
+  begin
+    start_beg_hand(StartVector, StopVector, 1, 0, 1);
+    repeat //выполняем пока не закончится выполнение тестовой последовательности
+      Stop := check_stop(Vector);
+    until Stop <> 0;
+  end;
+//------------------------------------------------------------------------------
+//Процедура запускающее ФК с места останова
+//------------------------------------------------------------------------------
+procedure Run_FC_Cont(StopVector: Integer);
+//StartVector - номер начального вектора
+//StopVector  - номер вектора в котором выполняется измерение
+  var
+    Vector,          //Номер вектора на котором остановлен ФК
+    Stop: Integer;   //Текущее состояние ФК
+  begin
+    start_cont(StopVector, 1, 0);
+    repeat //выполняем пока не закончится выполнение тестовой последовательности
+      Stop := check_stop(Vector);
+    until Stop <> 0;
+  end;
+//------------------------------------------------------------------------------
+//Процедура осуществляющая контроль контактирования и КЗ
+//------------------------------------------------------------------------------
+//*******************  ****************************
+Procedure MM_Contacting(TestName: string);
+ const
+    PARAMETR    = 'I=-100 мкА';//Параметр условий измерения
+    VCC_VOLTAGE = 0.0;         //[В] Напряжение питания
+    VCC_CURRENT = 0.05;         //[А] Ток ограничения источника питания
+    DCM_VOLTAGE = -2.0;        //[В] Напряжение DCM
+    DCM_CURRENT = 100e-6;      //[А] Ток DCM
+    DOWN_LIMIT  = -1.5;        //[В] Нижняя граница
+    UPPER_LIMIT = -0.1;        //[В] Верхняя границы
+  var
+    i          : Integer;
+    MeasResult : Real;        //[В] Результат измерений
+  Begin
+    SetPower(pVCC, VCC_VOLTAGE, VCC_CURRENT,Source_On);
+    SetDCM(DCM_VOLTAGE, RAuto, DCM_CURRENT, DCM_Auto);
+    ConnectDCM(DCM_To_Pins);
+    DelayMS(50);
+    for i := 1 to NumOfPin do  //Перебираем все вывода микросхемы
+      Begin
+        If not(ALL_PINS[i] in ALL_PINS_GROUP) Then
+          continue;
+        ConnectPin(ALL_PINS[i], [Pin_To_DCM]);
+        DelayMs(50);
+        MeasResult := OnlyMeasDCMVoltage(ADCRange_AUTO);
+        ConnectPin(ALL_PINS[i],[]);
+        PrintResult(TestName, PIN_NAMES[i], MeasResult, DOWN_LIMIT,
+                    UPPER_LIMIT, PARAMETR);
+      End;
+    SetPower(pVCC, 0.0, VCC_CURRENT, Source_Off);
+    SetDCM(0.0, RAuto, 1e-6, DCM_Auto);
+  End; //END MM_Contacting()
+//------------------------------------------------------------------------------
+//----------- Измерение напряжения на указанном выходе и вывод результата-------
+//------------------------------------------------------------------------------
+procedure MM_OutVoltage(I : Integer;
+                        TestName,   //название измеряемого парметра
+                        PARAMETR    //Параметр условий измерения
+                        : string;
+                        DOWN_LIMIT, //[В] Нижняя граница отбраковки
+                        UPPER_LIMIT //[В] Верхняя границы отбраковки
+                        : Real );
+  var
+    MeasResult : Real;        //[В] Результат измерений
+  Begin
+    DelayMS(10);
+    ConnectPin(OUT_PINS[I], [Pin_To_DCM]);
+    DelayMS(100);
+    MeasResult := OnlyMeasDCMVoltage(ADCRange_AUTO);
+    PrintResult(TestName, PIN_NAMES_OUT[I], MeasResult, DOWN_LIMIT,
+                    UPPER_LIMIT, PARAMETR);
+    ConnectPin(OUT_PINS[I], []);
+    DelayMS(10);
+  End;  //End MM_OutVoltage()
+//------------------------------------------------------------------------------
+//----------- Измерение выходного напряжения высокого уровня --------------------
+//------------------------------------------------------------------------------
+procedure MM_OutHighVoltage(TestName: string);
+  const
+    PARAMETR      = 'Io=0,4мА';//Параметр условий измерения
+    VCC_VOLTAGE   = 4.5;      //[В] Напряжение питания
+    VCC_CURRENT   = 0.05;     //[А] Ток ограничения источника питания
+    DCM_VOLTAGE   = 0.0;      //[В] Напряжение DCM
+    DCM_CURRENT   = 0.0004;   //[А] Ток DCM
+    DRIVER_LOW    = 0.7;      //[В] Низкий уровень драйвера
+    DRIVER_HIGH   = 2;        //[В] Высокий уровень драйвера
+    DRIVER_LOW_1  = 0.0;      //[В] Дополнительный низкий уровень драйвера
+    DRIVER_HIGH_1 = 4.5;      //[В] Дополнительный высокий уровень драйвера
+    DOWN_LIMIT    = 2.5;      //[В] Нижняя граница отбраковки
+    UPPER_LIMIT   = 4.55;     //[В] Верхняя границы отбраковки
+    START_VECTOR_1  = 0; //Номер начального вектора предустановочного ФК
+    STOP_VECTOR_1   = 6; //Номер конечного вектора предустановочного ФК, сброс
+    STOP_VECTOR_1_1 = 8; //Номер конечного вектора предустановочного ФК выв 5,9
+    STOP_VECTOR_1_2 = 11;//Номер конечного вектора предустановочного ФК выв 6,8
+    
+    START_VECTOR_2  = 13;//Номер начального вектора предустановочного ФК
+    STOP_VECTOR_2   = 16; //Номер конечного вектора предустановочного ФК, сброс
+    STOP_VECTOR_2_1 = 20;//Номер конечного вектора предустановочного ФК выв 5,9
+    STOP_VECTOR_2_2 = 23;//Номер конечного вектора предустановочного ФК выв 6,8
+    
+  Begin
+    SetPower(pVCC, VCC_VOLTAGE, VCC_CURRENT, Source_On);
+    ConnectDCM(DCM_To_Pins);
+    SetDCM(DCM_VOLTAGE, RAuto, DCM_CURRENT, DCM_Auto);
+    
+    ConnectPins(IN_PINS_GROUP_B1,[Pin_To_Drivers]);
+    ConnectPins(IN_PINS_GROUP_B2,[Pin_To_Drivers]);
+    LoadDACPinsLevels([PIN_BOARD_CNT], DRIVER_HIGH, DRIVER_LOW,
+                                                            1.0, 1.0, 0.0, 0.0);
+    LoadDACPinsLevels([PIN_BOARD_IN_LOAD], DRIVER_HIGH_1, DRIVER_LOW_1,
+                                                            1.0, 1.0, 0.0, 0.0);
+    SetDCM(DCM_VOLTAGE, R8, DCM_CURRENT, DCM_Auto);
+    DelayMS(10);
+    Run_FC_ST_Wait(START_VECTOR_1, STOP_VECTOR_1);
+    LoadDACPinsLevels([PIN_BOARD_IN_LOAD], DRIVER_HIGH, DRIVER_LOW,
+                                                            1.0, 1.0, 0.0, 0.0);
+    DelayMS(10);
+    Run_FC_Cont(STOP_VECTOR_1_1);
+//запись 1 сигналом R
+    MM_OutVoltage(1, TestName, PARAMETR, DOWN_LIMIT, UPPER_LIMIT);
+    MM_OutVoltage(4, TestName, PARAMETR, DOWN_LIMIT, UPPER_LIMIT);
+//измерили высокое напряжение по выходам Q, вывели результаты
+    Run_FC_Cont(STOP_VECTOR_1_2);
+//запись 0 сигналом S
+    MM_OutVoltage(2, TestName, PARAMETR, DOWN_LIMIT, UPPER_LIMIT);
+    MM_OutVoltage(3, TestName, PARAMETR, DOWN_LIMIT, UPPER_LIMIT);
+//измерили высокое напряжение по выходам NQ, вывели результаты
+
+    LoadDACPinsLevels([PIN_BOARD_IN_LOAD], DRIVER_HIGH_1, DRIVER_LOW_1,
+                                                            1.0, 1.0, 0.0, 0.0);
+    DelayMS(10);
+    Run_FC_ST_Wait(START_VECTOR_2, STOP_VECTOR_2);
+    DelayMS(10);
+    
+    Run_FC_Cont(STOP_VECTOR_2_1);
+//запись 1на D сигналом С
+    MM_OutVoltage(1, TestName, PARAMETR, DOWN_LIMIT, UPPER_LIMIT);
+    MM_OutVoltage(4, TestName, PARAMETR, DOWN_LIMIT, UPPER_LIMIT);
+//измерили высокое напряжение по выходам Q, вывели результаты
+    Run_FC_Cont(STOP_VECTOR_2_2);
+//запись 0 на D сигналом С
+    MM_OutVoltage(2, TestName, PARAMETR, DOWN_LIMIT, UPPER_LIMIT);
+    MM_OutVoltage(3, TestName, PARAMETR, DOWN_LIMIT, UPPER_LIMIT);
+//считали напряжение по выходам NQ, вывели результаты
+    ConnectPins(IN_PINS_GROUP_B1,[]);
+    ConnectPins(IN_PINS_GROUP_B2,[]);
+    SetDCM(0.0,RAuto, 1e-6, DCM_Auto);
+    ConnectDCM(DCM_Off);
+    SetPower(pVCC, 0.0, 0.01, Source_On);
+    ConnectPower(pVCC, Source_Off);
+  End;   //End MM_OutHighVoltage ()
+//------------------------------------------------------------------------------
+//----------- Измерение выходного напряжения низкого уровня --------------------
+//------------------------------------------------------------------------------
+procedure MM_OutLowVoltage(TestName: string);
+  const
+    PARAMETR      = 'Io=4мА';//Параметр условий измерения
+    VCC_VOLTAGE   = 4.5;      //[В] Напряжение питания
+    VCC_CURRENT   = 0.05;      //[А] Ток ограничения источника питания
+    DCM_VOLTAGE   = 4.5;      //[В] Напряжение DCM
+    DCM_CURRENT   = 0.004;    //[А] Ток DCM
+    DRIVER_LOW    = 0.7;      //[В] Низкий уровень драйвера
+    DRIVER_HIGH   = 2;        //[В] Высокий уровень драйвера
+    DRIVER_LOW_1  = 0.0;      //[В] Дополнительный низкий уровень драйвера
+    DRIVER_HIGH_1 = 4.5;      //[В] Дополнительный высокий уровень драйвера
+    DOWN_LIMIT    = -0.05;    //[В] Нижняя граница отбраковки
+    UPPER_LIMIT   = 0.4;     //[В] Верхняя границы отбраковки
+    START_VECTOR_1  = 24; //Номер начального вектора предустановочного ФК
+    STOP_VECTOR_1   = 29; //Номер конечного вектора предустановочного ФК сброс
+    STOP_VECTOR_1_1 = 31; //Номер конечного вектора предустановочного ФК выв 5,9
+    STOP_VECTOR_1_2 = 34;//Номер конечного вектора предустановочного ФК выв 6,8
+
+    START_VECTOR_2  = 36;//Номер начального вектора предустановочного ФК
+    STOP_VECTOR_2   = 40; //Номер конечного вектора предустановочного ФК сброс
+    STOP_VECTOR_2_1 = 43;//Номер конечного вектора предустановочного ФК выв 5,9
+    STOP_VECTOR_2_2 = 46;//Номер конечного вектора предустановочного ФК выв 6,8
+
+  Begin
+    SetPower(pVCC, VCC_VOLTAGE, VCC_CURRENT, Source_On);
+    ConnectDCM(DCM_To_Pins);
+    SetDCM(DCM_VOLTAGE, RAuto, DCM_CURRENT, DCM_Auto);
+
+    ConnectPins(IN_PINS_GROUP_B1,[Pin_To_Drivers]);
+    ConnectPins(IN_PINS_GROUP_B2,[Pin_To_Drivers]);
+    LoadDACPinsLevels([PIN_BOARD_CNT], DRIVER_HIGH, DRIVER_LOW,
+                                                            1.0, 1.0, 0.0, 0.0);
+    LoadDACPinsLevels([PIN_BOARD_IN_LOAD], DRIVER_HIGH_1, DRIVER_LOW_1,
+                                                            1.0, 1.0, 0.0, 0.0);
+    SetDCM(DCM_VOLTAGE, R8, DCM_CURRENT, DCM_Auto);
+    DelayMS(10);
+    Run_FC_ST_Wait(START_VECTOR_1, STOP_VECTOR_1);
+    LoadDACPinsLevels([PIN_BOARD_IN_LOAD], DRIVER_HIGH, DRIVER_LOW,
+                                                            1.0, 1.0, 0.0, 0.0);
+    DelayMS(10);
+    Run_FC_Cont(STOP_VECTOR_1_1);
+//запись 0 сигналом S
+    MM_OutVoltage(1, TestName, PARAMETR, DOWN_LIMIT, UPPER_LIMIT);
+    MM_OutVoltage(4, TestName, PARAMETR, DOWN_LIMIT, UPPER_LIMIT);
+//измерили низкое напряжение по выходам Q, вывели результаты
+    Run_FC_Cont(STOP_VECTOR_1_2);
+//запись 1 сигналом R
+    MM_OutVoltage(2, TestName, PARAMETR, DOWN_LIMIT, UPPER_LIMIT);
+    MM_OutVoltage(3, TestName, PARAMETR, DOWN_LIMIT, UPPER_LIMIT);
+ //измерили низкое напряжение по выходам NQ, вывели результаты
+    LoadDACPinsLevels([PIN_BOARD_IN_LOAD], DRIVER_HIGH_1, DRIVER_LOW_1,
+                                                            1.0, 1.0, 0.0, 0.0);
+    DelayMS(10);
+    Run_FC_ST_Wait(START_VECTOR_2, STOP_VECTOR_2);
+    DelayMS(10);
+    Run_FC_Cont(STOP_VECTOR_2_1);
+//запись 0 на D сигналом С
+    MM_OutVoltage(1, TestName, PARAMETR, DOWN_LIMIT, UPPER_LIMIT);
+    MM_OutVoltage(4, TestName, PARAMETR, DOWN_LIMIT, UPPER_LIMIT);
+//измерили низкое напряжение по выходам Q, вывели результаты
+    Run_FC_Cont(STOP_VECTOR_2_2);
+//запись 1 на D сигналом С
+    MM_OutVoltage(2, TestName, PARAMETR, DOWN_LIMIT, UPPER_LIMIT);
+    MM_OutVoltage(3, TestName, PARAMETR, DOWN_LIMIT, UPPER_LIMIT);
+//измерили низкое напряжение по выходам NQ, вывели результаты
+    ConnectPins(IN_PINS_GROUP_B1,[]);
+    ConnectPins(IN_PINS_GROUP_B2,[]);
+    SetDCM(0.0,RAuto, 1e-6, DCM_Auto);
+    ConnectDCM(DCM_Off);
+    SetPower(pVCC, 0.0, 0.01, Source_On);
+    ConnectPower(pVCC, Source_Off);
+  End;  //End MM_OutLowVoltage()
+//------------------------------------------------------------------------------
+//Процедура измерения падения напряжения на антизвонном диоде
+//------------------------------------------------------------------------------
+Procedure MM_Voltage_antiringing_diode(TestName: string);
+ const
+    PARAMETR    = 'I=-18 мА';  //Параметр условий измерения
+    VCC_VOLTAGE =  4.5;        //[В] Напряжение питания
+    VCC_CURRENT =  0.05;       //[А] Ток ограничения источника питания
+    DCM_VOLTAGE = -2.0;        //[В] Напряжение DCM
+    DCM_CURRENT =  0.018;      //[А] Ток DCM
+    DOWN_LIMIT  = -1.5;        //[В] Нижняя граница
+    UPPER_LIMIT = -0.1;        //[В] Верхняя границы
+  var
+    i          : Integer;
+    MeasResult : Real;        //[В] Результат измерений
+  Begin
+    SetPower(pVCC, VCC_VOLTAGE, VCC_CURRENT, Source_On);
+    SetDCM(DCM_VOLTAGE, RAuto, DCM_CURRENT, DCM_Auto);
+    ConnectDCM(DCM_To_Pins);
+    DelayMS(50);
+    for i := 1 to NumOfPin do  //Перебираем все вывода микросхемы
+      Begin
+        If not(ALL_PINS[i] in IN_PINS_GROUP) Then
+          continue;                //проводим измерение только для входов ОК
+        ConnectPin(ALL_PINS[i], [Pin_To_DCM]);
+        DelayMs(10);
+        MeasResult := OnlyMeasDCMVoltage(ADCRange_AUTO);
+        ConnectPin(ALL_PINS[i],[]);
+        PrintResult(TestName, PIN_NAMES[i], MeasResult, DOWN_LIMIT,
+                    UPPER_LIMIT, PARAMETR);   //выводим результат измерения
+      End;
+    SetDCM(0.0,RAuto, 1e-6, DCM_Auto);
+    ConnectDCM(DCM_Off);
+    SetPower(pVCC, 0.0, 0.01, Source_On);
+    ConnectPower(pVCC, Source_Off);
+  End; //END MM_Voltage_antiringing_diode()
+//------------------------------------------------------------------------------
+//-------------- Метод выполнения функционального контроля ---------------------
+//------------------------------------------------------------------------------
+procedure MM_FunctionalCheck(TestName,   //наименование измеряемого параметра
+                             PARAMETR    //Параметр условий измерения
+                            : string;
+                            VCC_VOLTAGE  //[В] Напряжение питания
+                            : Real);
+  const
+    VCC_CURRENT      = 0.05;       //[А] Ток ограничения источника питания
+    DRIVER_LOW       = 0.4;        //[В] Низкий уровень драйвера
+    DRIVER_HIGH      = 4.5;        //[В] Низкий уровень драйвера
+    COMPARATOR_LOW   = 0.4;        //[В] Низкий уровень компаратора
+    COMPARATOR_HIGH  = 2.5;        //[В] при VCC = 4.5 В
+    DCM_CURRENT      = 0.1;        //[А] Ток ограничения DCM
+    START_VECTOR     = 50;          //Номер начального вектора ФК
+    STOP_VECTOR      = 100;         //Номер конечного вектора ФК
+  var
+    Vector,         //Номер вектора на котором остановлен ФК
+    Stop: Integer;  //Текущее состояние ФК
+  begin
+    SetPower(pVCC, VCC_VOLTAGE, VCC_CURRENT, Source_On);
+    ConnectPins(IN_PINS_GROUP_B1, [Pin_To_Drivers]);
+    ConnectPins(IN_PINS_GROUP_B2, [Pin_To_Drivers]);
+    ConnectPins(OUT_PINS_GROUP, [Pin_To_Drivers]);
+//покдлючили входы и выходы обьекта контроля
+//для проведения функционального контроля
+    ConnectPins(LOAD_PINS, [Pin_To_DCM]);
+    //подключили резисторы на выходах ОК к DCM
+    ConnectDCM(DCM_To_Pins);
+    SetDCM(VCC_VOLTAGE, RAuto, DCM_CURRENT, DCM_Auto);
+    //установили напряжение на резисторах
+    LoadDACPinsLevels([PIN_BOARD_CNT, PIN_BOARD_IN_LOAD],DRIVER_HIGH, DRIVER_LOW,
+                                     COMPARATOR_HIGH, COMPARATOR_LOW, 0.0, 0.0);
+    DelayMS(50);
+
+    //Выполняем ФК с остановкой по конечному вектору, с остановкой по ошибке и
+    //без режима продолжения ФК
+    start_beg_hand(START_VECTOR, STOP_VECTOR, 1, 1, 0);
+    repeat
+      Stop := check_stop(Vector);
+    until Stop <> 0;
+
+    PrintResult(TestName, Stop, Vector, STOP_VECTOR, STOP_VECTOR,
+                PARAMETR);
+    //отключили входы и выходы обьекта контроля
+    ConnectPins(IN_PINS_GROUP_B1, []);
+    ConnectPins(IN_PINS_GROUP_B2, []);
+    ConnectPins(OUT_PINS_GROUP, []);
+    ConnectPins(LOAD_PINS, []);
+    SetDCM(0.0, RAuto, 1e-6, DCM_Auto);
+    ConnectDCM(DCM_Off);
+ //Отключаем питание от объекта контроля
+    SetPower(pVCC, 0.0, 0.01, Source_On);
+    ConnectPower(pVCC, Source_Off);
+  end;//END FunctionalCheck()
+
+//------------------------------------------------------------------------------
+//----------------- Измерение входного тока высокого уровня --------------------
+//------------------------------------------------------------------------------
+procedure MM_InputHighCurrent(TestName: string);
+  const
+    PARAMETR     = 'Uih=2.7 В'; //Параметр условий измерения
+    VCC_VOLTAGE  = 5.5;        //[В] Напряжение питания
+    VCC_CURRENT  = 0.05;        //[А] Ток ограничения источника питания
+    DCM_VOLTAGE  = 2.7;        //[В] Напряжение DCM
+    DCM_CURRENT  = 60.0e-6;    //[А] Ток DCM
+    DRIVER_LOW   = 0.0;        //[В] Низкий уровень драйвера
+    DRIVER_High  = 4.5;        //[В] Высокий уровень драйвера
+    DOWN_LIMIT   = -20.0;      //[мкА] Нижняя граница
+    UPPER_LIMIT  =  20.0;      //[мкА] Верхняя границы
+    DOWN_LIMIT2  = -40.0;      //[мкА] Нижняя граница
+    UPPER_LIMIT2 =  40.0;      //[мкА] Верхняя границы
+  var
+    i, J          : Integer;
+    MeasResult : Real;        //[мкА] Результат измерений
+  begin
+    SetPower(pVCC, VCC_VOLTAGE, VCC_CURRENT, Source_On);
+    ConnectDCM(DCM_To_Pins);
+    SetDCM(DCM_VOLTAGE, RAuto, DCM_CURRENT, DCM_Auto);
+    DelayMS(50);
+    LoadDACPinsLevels([PIN_BOARD_CNT], DRIVER_High, DRIVER_LOW,
+                                                           0.0, 0.0, 0.0, 0.0);
+    ConnectPins(IN_PINS_GROUP, [Pin_To_Drivers]);
+    J := 1;
+    for i := 1 to NumOfPin do  //Перебираем все выводы,
+                               //подключаем входы микросхемы 2,3,11,12
+      begin
+        if not(ALL_PINS[i] in IN_PINS_GROUP_B1) then
+          continue;
+        SendPat(PIN_BOARD_CNT, SetHL1[j], SetBLK1[j]);
+    //выставили на входах требуемую комбинацию 0/1
+        ConnectPin(ALL_PINS[i], [Pin_To_DCM]);
+        DelayMs(150);
+        MeasResult := OnlyMeasDCMCurent * 1e6;//[мкА]
+        ConnectPin(ALL_PINS[i], [Pin_To_Drivers]);
+        //оставили вход подключенным к драйверам
+        PrintResult(TestName, PIN_NAMES[i], MeasResult, DOWN_LIMIT,
+                    UPPER_LIMIT, PARAMETR);
+        J := J + 1;
+      end;
+        J := 1;
+    for i := 1 to NumOfPin do  //Перебираем все выводы,
+                               //подключаем входы микросхемы 1,4,10,13
+      begin
+        if not(ALL_PINS[i] in IN_PINS_RS_GROUP_B1) then
+          continue;
+        SendPat(PIN_BOARD_CNT, SetHL2[j], SetBLK2[j]);
+      //выставили на входах требуемую комбинацию 0/1
+        ConnectPin(ALL_PINS[i], [Pin_To_DCM]);
+        DelayMs(150);
+        MeasResult := OnlyMeasDCMCurent * 1e6;//[мкА]
+        ConnectPin(ALL_PINS[i], [Pin_To_Drivers]);
+        //оставили вход подключенным к драйверам
+        PrintResult(TestName, PIN_NAMES[i], MeasResult, DOWN_LIMIT2,
+                    UPPER_LIMIT2, PARAMETR);
+        J := J + 1;
+      end;
+    SendPat(PIN_BOARD_CNT, !0000000000000000,
+                           !1111111111111111);
+    ConnectPins(IN_PINS_GROUP, []);
+    SetDCM(0.0,RAuto, 1e-6, DCM_Auto);
+    ConnectDCM(DCM_Off);
+    SetPower(pVCC, 0.0, 0.01, Source_On);
+    ConnectPower(pVCC, Source_Off);
+  end;//MM_InputHighCurrent()
+//------------------------------------------------------------------------------
+//----------------- Измерение входного тока низкого уровня --------------------
+//------------------------------------------------------------------------------
+procedure MM_InputLowCurrent(TestName: string);
+  const
+    PARAMETR     = 'Uil=0.4 В'; //Параметр условий измерения
+    VCC_VOLTAGE  = 5.5;        //[В] Напряжение питания
+    VCC_CURRENT  = 0.05;        //[А] Ток ограничения источника питания
+    DCM_VOLTAGE  = 0.4;        //[В] Напряжение DCM
+    DCM_CURRENT  = 1.2e-3;     //[А] Ток DCM
+    DRIVER_LOW   = 0.0;        //[В] Низкий уровень драйвера
+    DRIVER_High  = 4.5;        //[В] Высокий уровень драйвера
+    DOWN_LIMIT   = -0.4;       //[мА] Нижняя граница
+    UPPER_LIMIT  =  0.001;     //[мА] Верхняя границы
+    DOWN_LIMIT2  = -0.8;       //[мА] Нижняя граница
+    UPPER_LIMIT2 =  0.001;     //[мА] Верхняя границы
+  var
+    i, J          : Integer;
+    MeasResult : Real;        //[мА] Результат измерений
+  begin
+    SetPower(pVCC, VCC_VOLTAGE, VCC_CURRENT, Source_On);
+    ConnectDCM(DCM_To_Pins);
+    SetDCM(DCM_VOLTAGE, RAuto, DCM_CURRENT, DCM_Auto);
+    DelayMS(50);
+    LoadDACPinsLevels([PIN_BOARD_CNT], DRIVER_High, DRIVER_LOW,
+                                                           0.0, 0.0, 0.0, 0.0);
+    ConnectPins(IN_PINS_GROUP, [Pin_To_Drivers]);
+    J := 1;
+    for i := 1 to NumOfPin do  //Перебираем все выводы,
+                               //подключаем входы микросхемы 2,3,11,12
+      begin
+        if not(ALL_PINS[i] in IN_PINS_GROUP_B1) then
+          continue;
+        SendPat(PIN_BOARD_CNT, SetHL3[j], SetBLK3[j]);
+      //выставили на входах требуемую комбинацию 0/1
+        ConnectPin(ALL_PINS[i], [Pin_To_DCM]);
+        DelayMs(100);
+        MeasResult := OnlyMeasDCMCurent * 1e3;//[мА]
+        ConnectPin(ALL_PINS[i], [Pin_To_Drivers]);
+        //оставили вход подключенным к драйверам
+        PrintResult(TestName, PIN_NAMES[i], MeasResult, DOWN_LIMIT,
+                    UPPER_LIMIT, PARAMETR);
+        J := J + 1;
+      end;
+        J := 1;
+    for i := 1 to NumOfPin do  //Перебираем все выводы,
+                               //подключаем входы микросхемы 1,4,10,13
+      begin
+        if not(ALL_PINS[i] in IN_PINS_RS_GROUP_B1) then
+          continue;
+        SendPat(PIN_BOARD_CNT, SetHL4[j], SetBLK4[j]);
+       //выставили на входах требуемую комбинацию 0/1
+        ConnectPin(ALL_PINS[i], [Pin_To_DCM]);
+        DelayMs(100);
+        MeasResult := OnlyMeasDCMCurent * 1e3;//[мА]
+        ConnectPin(ALL_PINS[i], [Pin_To_Drivers]);
+        //оставили вход подключенным к драйверам
+        PrintResult(TestName, PIN_NAMES[i], MeasResult, DOWN_LIMIT2,
+                    UPPER_LIMIT2, PARAMETR);
+        J := J + 1;
+      end;
+    SendPat(PIN_BOARD_CNT, !0000000000000000,
+                           !1111111111111111);
+    ConnectPins(IN_PINS_GROUP, []);
+    SetDCM(0.0,RAuto, 1e-6, DCM_Auto);
+    ConnectDCM(DCM_Off);
+    SetPower(pVCC, 0.0, 0.01, Source_On);
+    ConnectPower(pVCC, Source_Off);
+  end;//MM_InputLowCurrent();
+//------------------------------------------------------------------------------
+//----------------- Измерение входного пробивного тока  ------------------------
+//------------------------------------------------------------------------------
+procedure MM_InputBreakdownCurrent(TestName: string);
+  const
+    PARAMETR     = 'Uih=7.0 В'; //Параметр условий измерения
+    VCC_VOLTAGE  = 5.5;        //[В] Напряжение питания
+    VCC_CURRENT  = 0.05;       //[А] Ток ограничения источника питания
+    DCM_VOLTAGE  = 7.0;        //[В] Напряжение DCM
+    DCM_CURRENT  = 150.0e-6;   //[А] Ток DCM
+    DRIVER_LOW   = 0.0;        //[В] Низкий уровень драйвера
+    DRIVER_High  = 4.5;        //[В] Высокий уровень драйвера
+    DOWN_LIMIT   =  -0.1;      //[мкА] Нижняя граница
+    UPPER_LIMIT  =  50.0;      //[мкА] Верхняя границы
+    DOWN_LIMIT2  =  -0.1;      //[мкА] Нижняя граница
+    UPPER_LIMIT2 = 100.0;      //[мкА] Верхняя границы
+  var
+    i, J          : Integer;
+    MeasResult : Real;        //[мкА] Результат измерений
+  begin
+    SetPower(pVCC, VCC_VOLTAGE, VCC_CURRENT, Source_On);
+    ConnectDCM(DCM_To_Pins);
+    SetDCM(DCM_VOLTAGE, RAuto, DCM_CURRENT, DCM_Auto);
+    DelayMS(50);
+    LoadDACPinsLevels([PIN_BOARD_CNT], DRIVER_High, DRIVER_LOW,
+                                                           0.0, 0.0, 0.0, 0.0);
+    ConnectPins(IN_PINS_GROUP, [Pin_To_Drivers]);
+    J := 1;
+    for i := 1 to NumOfPin do  //Перебираем все выводы,
+                               //подключаем входы микросхемы 2,3,11,12
+      begin
+        if not(ALL_PINS[i] in IN_PINS_GROUP_B1) then
+          continue;
+        SendPat(PIN_BOARD_CNT, SetHL1[j], SetBLK1[j]);
+        //выставили на входах требуемую комбинацию 0/1
+        ConnectPin(ALL_PINS[i], [Pin_To_DCM]);
+        DelayMs(150);
+        MeasResult := OnlyMeasDCMCurent * 1e6;//[мкА]
+        ConnectPin(ALL_PINS[i], [Pin_To_Drivers]);
+        //оставили вход подключенным к драйверам
+        PrintResult(TestName, PIN_NAMES[i], MeasResult, DOWN_LIMIT,
+                    UPPER_LIMIT, PARAMETR);
+        J := J + 1;
+      end;
+        J := 1;
+    for i := 1 to NumOfPin do  //Перебираем все выводы,
+                               //подключаем входы микросхемы 1,4,10,13
+      begin
+        if not(ALL_PINS[i] in IN_PINS_RS_GROUP_B1) then
+          continue;
+        SendPat(PIN_BOARD_CNT, SetHL2[j], SetBLK2[j]);
+        //выставили на входах требуемую комбинацию 0/1
+        ConnectPin(ALL_PINS[i], [Pin_To_DCM]);
+        DelayMs(150);
+        MeasResult := OnlyMeasDCMCurent * 1e6;//[мкА]
+        ConnectPin(ALL_PINS[i], [Pin_To_Drivers]);
+        //оставили вход подключенным к драйверам
+        PrintResult(TestName, PIN_NAMES[i], MeasResult, DOWN_LIMIT2,
+                    UPPER_LIMIT2, PARAMETR);
+        J := J + 1;
+      end;
+    SendPat(PIN_BOARD_CNT, !0000000000000000,
+                           !1111111111111111);
+    ConnectPins(IN_PINS_GROUP, []);
+    SetDCM(0.0,RAuto, 1e-6, DCM_Auto);
+    ConnectDCM(DCM_Off);
+    SetPower(pVCC, 0.0, 0.01, Source_On);
+    ConnectPower(pVCC, Source_Off);
+  end;//MM_InputBreakdownCurrent()
+  
+//------------------------------------------------------------------------------
+//----------------- Измерение выходного тока короткого замыкания ---------------
+//------------------------------------------------------------------------------
+procedure MM_OutputShortCircuitCurrent(TestName: string);
+  const
+    PARAMETR     = 'Uos=0.0 В'; //Параметр условий измерения
+    VCC_VOLTAGE  = 5.5;        //[В] Напряжение питания
+    VCC_CURRENT  = 0.095;       //[А] Ток ограничения источника питания
+    DCM_VOLTAGE  = 0.0;        //[В] Напряжение DCM
+    DCM_CURRENT  = 90.0e-3;    //[А] Ток DCM
+    DRIVER_LOW   = 0.0;        //[В] Низкий уровень драйвера
+    DRIVER_High  = 4.5;        //[В] Высокий уровень драйвера
+    UPPER_LIMIT  =  -20.0;     //[мА] Верхняя границы
+    DOWN_LIMIT   = -100.0;     //[мА] Нижняя граница
+
+  var
+    i, J          : Integer;
+    MeasResult : Real;        //[мА] Результат измерений
+  begin
+    SetPower(pVCC, VCC_VOLTAGE, VCC_CURRENT, Source_On);
+    ConnectDCM(DCM_To_Pins);
+    SetDCM(DCM_VOLTAGE, RAuto, DCM_CURRENT, DCM_Auto);
+    DelayMS(50);
+    LoadDACPinsLevels([PIN_BOARD_CNT], DRIVER_High, DRIVER_LOW,
+                                                           0.0, 0.0, 0.0, 0.0);
+    ConnectPins(IN_PINS_GROUP, [Pin_To_Drivers]);
+    DelayMS(10);
+    J := 1;
+    for i := 1 to NumOfPin do  //Перебираем все выводы,
+                               //подключаем выходы микросхемы 5,6,8,9
+      begin
+        if not(ALL_PINS[i] in OUT_PINS_GROUP) then
+          continue;
+        SendPat(PIN_BOARD_CNT, SetHL5[j], SetBLK5[j]);
+      //выставили на входах требуемую комбинацию 0/1
+        ConnectPin(ALL_PINS[i], [Pin_To_DCM]);
+        DelayMs(50);
+        MeasResult := OnlyMeasDCMCurent * 1e3;//[мА]
+        ConnectPin(ALL_PINS[i], []);
+       //отключили выход от измерителя
+        PrintResult(TestName, PIN_NAMES[i], MeasResult, DOWN_LIMIT,
+                    UPPER_LIMIT, PARAMETR);
+        J := J + 1;
+      end;
+
+    SendPat(PIN_BOARD_CNT, !0000000000000000,
+                           !1111111111111111);
+    ConnectDCM(DCM_Off);
+    ConnectPins(IN_PINS_GROUP, []);
+    SetDCM(0.0,RAuto, 1e-6, DCM_Auto);
+    ConnectDCM(DCM_Off);
+    SetPower(pVCC, 0.0, 0.01, Source_On);
+    ConnectPower(pVCC, Source_Off);
+  end;//MM_OutputShortCircuitCurrent();
+//------------------------------------------------------------------------------
+//----------------- Измерение тока потребления ---------------------------------
+//------------------------------------------------------------------------------
+procedure MM_SupplyCurrent(TestName: string);
+  const
+    PARAMETR     = 'Uсс=5.5 В'; //Параметр условий измерения
+    VCC_VOLTAGE  = 5.5;        //[В] Напряжение питания
+    VCC_CURRENT  = 0.05;        //[А] Ток ограничения источника питания
+    DCM_CURRENT  = 15.0e-3;   //[А] Ток DCM
+    DRIVER_LOW   = 0.0;        //[В] Низкий уровень драйвера
+    DRIVER_High  = 4.5;        //[В] Высокий уровень драйвера
+    UPPER_LIMIT  =  8.0;       //[мА] Верхняя границы
+    DOWN_LIMIT   =  0.05;       //[мА] Нижняя граница
+
+  var
+    MeasResult    : Real;      //[мА] Результат измерений
+  begin
+    ConnectPower(pVCC, Source_Off);
+    SetDCM(0.0, R8, 1e-6, DCM_Auto);
+    ConnectDCM(DCM_To_VCC); // Подключает измеритель DCM к VCC
+    SetDCM(VCC_VOLTAGE, R8, DCM_CURRENT, DCM_Auto);
+    DelayMS(50);
+    LoadDACPinsLevels([PIN_BOARD_CNT], DRIVER_High, DRIVER_LOW,
+                                                           0.0, 0.0, 0.0, 0.0);
+    ConnectPins(IN_PINS_GROUP, [Pin_To_Drivers]);
+    SendPat(PIN_BOARD_CNT, !0000001000001000,
+                           !1110000111110000);
+    DelayMs(50);
+    MeasResult := OnlyMeasDCMCurent * 1e3;//[мА]
+    PrintResult(TestName, 'Vcc/14', MeasResult, DOWN_LIMIT,
+                                                        UPPER_LIMIT, PARAMETR);
+    SendPat(PIN_BOARD_CNT, !0001000000000001,
+                           !1110000111110000);
+    DelayMS(50);
+    MeasResult := OnlyMeasDCMCurent * 1e3;//[мА]
+    PrintResult(TestName, 'Vcc/14', MeasResult, DOWN_LIMIT,
+                                                    UPPER_LIMIT, PARAMETR);
+    SendPat(PIN_BOARD_CNT, !0000000000000000,
+                           !1111111111111111);
+    ConnectPins(IN_PINS_GROUP, []);
+    SetDCM(0.0,RAuto, 1e-6, DCM_Auto);
+    ConnectDCM(DCM_Off);
+    SetPower(pVCC, 0.0, 0.1, Source_Off);
+  end;//MM_SupplyCurrent();
+  
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//+++++++++++++++++++++ Основное тело программы+++++++++++++++++++++++++++++++++
+
+Initialization
+//инициализация файлов ФК
+  LoadFKFile('FK_N533TM2.tsq',False);
+  Time_to_FKRec('FTM_N533TM2','FK_N533TM2');
+  ActivateFileFK('FK_N533TM2.tsq',True);
+  UnConnectAll;
+MEASBEGIN
+//contact(MeasPin,Up,UDCM, NG , VG );
+  MM_Contacting('Контакт., В'); //проверяем контактирование
+
+//MM_OutHighVoltage_Uol(TestName: string);
+  MM_OutHighVoltage('Uoh, В');
+//измерели выходное  напряжения  высокого уровня
+
+//MM_OutLowVoltage_Uol(TestName: string);
+  MM_OutLowVoltage('Uol, В');
+//измерели выходное  напряжения  низкого уровня
+
+//procedure MM_FunctionalCheck(TestName, PARAMETR, VCC_VOLTAGE);
+  MM_FunctionalCheck('FT1', 'Ucc=4.5 В', 4.5);
+  MM_FunctionalCheck('FT2', 'Ucc=5.0 В', 5.0);
+  MM_FunctionalCheck('FT3', 'Ucc=5.5 В', 5.5);
+// провели функциональный контроль при разном напряжении питания
+
+// MM_Voltage_antiringing_diode(TestName: string);
+  MM_Voltage_antiringing_diode('Ucdi, В');
+// измерели падения напряжения на антизвонном диоде
+
+//MM_InputHighCurrent(TestName: string);
+  MM_InputHighCurrent('Iih, мкА');
+  //измерили входной ток высокого уровня
+
+//MM_InputLowCurrent(TestName: string);
+  MM_InputLowCurrent('Iil, мА');
+  //измерили входной ток низкого уровня
+  
+//MM_InputBreakdownCurrent(TestName: string);
+  MM_InputBreakdownCurrent('Iib, мкА');
+  //измерили входной пробивной ток
+  
+//MM_OutputShortCircuitCurrent(TestName: string);
+  MM_OutputShortCircuitCurrent('Ios, мА');
+  //измерили выходной ток короткого замыкания
+  
+//MM_SupplyCurrent(TestName: string);
+  MM_SupplyCurrent('Icc, мА');
+//измерили ток потребелния микросхемы
+
+  LoadDACPinsLevels([PIN_BOARD_CNT, PIN_BOARD_IN_LOAD], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+
+Finalization
+  UnConnectAll;
+END.
